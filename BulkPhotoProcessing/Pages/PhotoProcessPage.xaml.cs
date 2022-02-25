@@ -25,5 +25,9 @@ namespace BulkPhotoProcessing.Pages
             InitializeComponent();
         }
 
+        private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+
+        }
     }
 }

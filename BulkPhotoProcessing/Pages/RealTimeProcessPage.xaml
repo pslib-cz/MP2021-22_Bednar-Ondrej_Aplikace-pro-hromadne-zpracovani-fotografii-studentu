@@ -21,6 +21,7 @@
         <StackPanel Grid.Column="1">
             <ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="{Binding SelectedIndex}"/>
             <Button Content="Start capturing" Command="{Binding StartCapture}"/>
+            <Button Content="Take picture" Command="{Binding TakePicture}"/>
         </StackPanel>
     </Grid>
 </Page>

@@ -22,8 +22,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ListBox ItemsSource="{Binding Images}" FlowDirection="LeftToRight"/>
-        <ListBox ItemsSource="{Binding Names}" Grid.Column="1" FlowDirection="LeftToRight">
+        <ListBox ItemsSource="{Binding Images}" FlowDirection="LeftToRight">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid SizeChanged="Grid_SizeChanged">
+                        <Image Source="{Binding Source}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+            <ListBox ItemsSource="{Binding Names}" Grid.Column="1" FlowDirection="LeftToRight">
         
         </ListBox>
         <StackPanel Grid.Column="2">
