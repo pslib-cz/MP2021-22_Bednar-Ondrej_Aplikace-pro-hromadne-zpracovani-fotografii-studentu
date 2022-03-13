@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BulkPhotoProcessing"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Aplikace pro hromadné zpracování fotografií" Height="450" Width="800" MinWidth="400" MinHeight="250">
 
     <DockPanel>
         <Frame x:Name="_mainFrame" NavigationUIVisibility="Hidden"/>

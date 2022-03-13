@@ -20,7 +20,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Aplikace pro hromadné zpracování studentů" Grid.ColumnSpan="3" HorizontalAlignment="Center" 
+        <TextBlock Text="Aplikace pro hromadné zpracování fotografií" Grid.ColumnSpan="3" HorizontalAlignment="Center" 
                    VerticalAlignment="Center" 
                    Foreground="Aqua"
                    FontSize="24"
