@@ -22,7 +22,7 @@ namespace BulkPhotoProcessing.Viewmodels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         private ObservableCollection<string> _cameras = new ObservableCollection<string>();
-        private Dispatcher dispatcher;
+        private Dispatcher dispatcher =  Dispatcher.CurrentDispatcher;
         private bool isCapturing = false, isFaceCaptured;
         private VideoCapture cap;
         private int _selectedIndex = 0, _picturesTaken = 0;
@@ -39,7 +39,6 @@ namespace BulkPhotoProcessing.Viewmodels
 
         public RealTimeProcessingViewmodel()
         {
-            dispatcher = Dispatcher.CurrentDispatcher;
             foreach (var device in DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice))
             {
                 Cameras.Add(device.Name);

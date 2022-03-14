@@ -15,26 +15,58 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-            <ItemsControl ItemsSource="{Binding Images}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        <ListBox ItemsSource="{Binding Names}" Grid.Column="1" FlowDirection="LeftToRight">
-        </ListBox>
-        <StackPanel Grid.Column="2">
+        <ScrollViewer>
+            <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Images}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid>
+                                
+                                </UniformGrid>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <ListBox ItemsSource="{Binding Names}" FlowDirection="LeftToRight" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer Grid.Column="1" Grid.ColumnSpan="2">
+            <StackPanel>
+                    <ListView ItemsSource="{Binding ImageNames}">
+                        <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Obrázek" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding Image}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Jméno" Width="auto" DisplayMemberBinding="{Binding Name}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Column="2" Grid.Row="1">
             <Button Content="Vyberte studenty" Command="{Binding AddNamesList}"/>
             <Button Content="Vyberte fotografie" Command="{Binding AddPhotos}"/>
-            <Button Content="Zpracovat fotografie" Command="{Binding ProcessPhotos}"/>
+            <Button Content="Předzpracovat fotografie" Command="{Binding PreProcessPhotos}"/>
+            <Button Content="zpracovat fotografie" Command="{Binding ProcessPhotos}"/>
         </StackPanel>
     </Grid>
 </Page>

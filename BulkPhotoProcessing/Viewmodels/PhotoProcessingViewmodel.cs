@@ -1,4 +1,5 @@
 ﻿using BulkPhotoProcessing.Helpers;
+using BulkPhotoProcessing.NewFolder;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Microsoft.Win32;
@@ -24,23 +25,27 @@ namespace BulkPhotoProcessing.Viewmodels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        private Dispatcher dispatcher;
 
         private ObservableCollection<string> _names = new ObservableCollection<string>();
         private ObservableCollection<Image> _images = new ObservableCollection<Image>();
+        private ObservableCollection<ImageNames> _imgNames = new ObservableCollection<ImageNames>();
         private List<string> _files = new List<string>();
-        private bool namesChosen = false, picturesChosen = false;
+        private bool namesChosen = false, picturesChosen = false, preProcessed = false;
         private string _errorPictures = "";
 
         public ObservableCollection<string> Names { get { return _names; } set { _names = value; NotifyPropertyChanged(); } }
         public ObservableCollection<Image> Images { get { return _images; } set { _images = value; NotifyPropertyChanged(); } }
-
+        public ObservableCollection<ImageNames> ImageNames { get { return _imgNames; } set { _imgNames = value; NotifyPropertyChanged();} }
+        public bool PreProcessed { get { return preProcessed; } set { preProcessed = value; ProcessPhotos.RaiseCanExecuteChanged(); } }
+        public bool PicturesChosen { get { return picturesChosen; } set { picturesChosen = value; PreProcessPhotos.RaiseCanExecuteChanged(); } }
+        public bool NamesChosen { get { return namesChosen; } set { namesChosen = value; PreProcessPhotos.RaiseCanExecuteChanged(); } }
+        
         public RelayCommand AddPhotos { get; set; }
         public RelayCommand AddNamesList { get; set; }
+        public RelayCommand PreProcessPhotos { get; set; }
         public RelayCommand ProcessPhotos { get; set; }
         public PhotoProcessingViewmodel()
         {
-            dispatcher = Dispatcher.CurrentDispatcher;
             AddPhotos = new RelayCommand(
                 () =>
                 {
@@ -70,10 +75,10 @@ namespace BulkPhotoProcessing.Viewmodels
                                 image.Source = Helper.ToBitmapSource(colored);
 
                                 //Add image to the list of images
-                                Dispatcher.CurrentDispatcher.Invoke(() => { Images.Add(image); });
+                                Images.Add(image);
                                 _files.Add(path);
 
-                                picturesChosen = true;
+                                PicturesChosen = true;
                             }
                             else
                             {
@@ -110,20 +115,39 @@ namespace BulkPhotoProcessing.Viewmodels
                             Names.Add(name.Split("\r\n")[1]);
                         }
 
-                        namesChosen = true;
+                        NamesChosen = true;
                         ProcessPhotos.RaiseCanExecuteChanged();
 
                     }
                 },
                 () => true);
-            ProcessPhotos = new RelayCommand(
-                async () =>
+            PreProcessPhotos = new RelayCommand(
+                () =>
                 {
                     if (Images.Count != Names.Count)
                     {
                         MessageBox.Show($"Počet fotek a jmen nesedí.\r\nZkontrolujte svoje seznamy a zkuste to znovu. \r\npočet fotek: {_images.Count} \r\npočet jmen: {_names.Count}");
                         return;
                     }
+                    for (int i = 0; i < _files.Count; i++)
+                    {
+                        ImageNames s = new ImageNames()
+                        {
+                            Name = _names[i],
+                            Image = _images[i].Source
+                        };
+                        ImageNames.Add(s);
+                        PreProcessed = true;
+                    }
+                },
+                () =>
+                {
+                    if (NamesChosen && PicturesChosen) return true;
+                    return false;
+                });
+            ProcessPhotos = new RelayCommand(
+                async () =>
+                {
                     for (int i = 0; i < _files.Count; i++)
                     {
                         try
@@ -148,10 +172,8 @@ namespace BulkPhotoProcessing.Viewmodels
                 },
                 () =>
                 {
-                    if (namesChosen && picturesChosen) return true;
-                    return false;
+                    return PreProcessed;
                 });
-
         }
     }
 }
