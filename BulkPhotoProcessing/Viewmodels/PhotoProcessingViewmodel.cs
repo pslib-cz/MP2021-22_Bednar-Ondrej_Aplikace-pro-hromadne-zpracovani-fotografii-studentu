@@ -107,6 +107,7 @@ namespace BulkPhotoProcessing.Viewmodels
                         Names.Clear();
                         string[] n = File.ReadAllText(dialog.FileName).Split(',');
                         //Sort the names by alphabet
+                        n[0] = "\r\n" + n[0].Split("\r\n")[1];
                         Array.Sort(n, StringComparer.InvariantCulture);
 
                         foreach (var name in n)
