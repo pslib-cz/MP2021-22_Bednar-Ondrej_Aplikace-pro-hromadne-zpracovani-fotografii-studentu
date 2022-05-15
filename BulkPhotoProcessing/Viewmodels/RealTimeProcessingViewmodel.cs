@@ -9,12 +9,13 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using UWPBindingCollection.ViewModels;
 
 namespace BulkPhotoProcessing.Viewmodels
 {
-    internal class RealTimeProcessingViewmodel
+    internal class RealTimeProcessingViewmodel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -27,15 +28,18 @@ namespace BulkPhotoProcessing.Viewmodels
         private VideoCapture cap;
         private int _selectedIndex = 0, _picturesTaken = 0;
         private Image<Bgr, byte> _faceImage;
+        private BitmapSource _image;
 
-        public bool IsCapturing { get { return isCapturing; } set { isCapturing = value; TakePicture.RaiseCanExecuteChanged(); StartCapture.RaiseCanExecuteChanged(); } }
+        public bool IsCapturing { get { return isCapturing; } set { isCapturing = value; TakePicture.RaiseCanExecuteChanged(); StartCapture.RaiseCanExecuteChanged(); StopCapture.RaiseCanExecuteChanged(); } }
         public bool IsFaceCaptured { get { return isFaceCaptured; } set { isFaceCaptured = value; TakePicture.RaiseCanExecuteChanged(); StartCapture.RaiseCanExecuteChanged(); } }
-        
+        public BitmapSource Image { get { return _image; } set { _image = value; NotifyPropertyChanged(); } }
+
 
         public ObservableCollection<string> Cameras { get { return _cameras; } set { _cameras = value; NotifyPropertyChanged(); } }
         public int SelectedIndex { get { return _selectedIndex; } set { _selectedIndex = value; NotifyPropertyChanged(); } }
         public RelayCommand StartCapture { get; set; }
         public RelayCommand TakePicture { get; set; }
+        public RelayCommand StopCapture { get; set; }
 
         public RealTimeProcessingViewmodel()
         {
@@ -70,6 +74,14 @@ namespace BulkPhotoProcessing.Viewmodels
                     _picturesTaken++;
                 },
                 () => { return IsCapturing; });
+            StopCapture = new RelayCommand(
+                () =>
+                {
+                    cap.Stop();
+                    cap.Dispose();
+                    dispatcher.Invoke(() => IsCapturing = false);
+                },
+                () => { return IsCapturing; });
         }
 
         private void FrameCaptured(object sender, EventArgs e)
@@ -96,14 +108,7 @@ namespace BulkPhotoProcessing.Viewmodels
                     CvInvoke.Rectangle(img, new Rectangle(face.X - 25, face.Y - 75, face.Width + 50, face.Height + 150), new MCvScalar(0, 0, 255), 2);
                 }
             }
-            CvInvoke.Imshow("Video", img);
-            if (CvInvoke.WaitKey(1) == 'q')
-            {
-                cap.Stop();
-                cap.Dispose();
-                dispatcher.Invoke(() => IsCapturing = false);
-                CvInvoke.DestroyWindow("Video");
-            }
+            dispatcher.Invoke(() => Image = Helper.ToBitmapSource(img));
         }
 
 

@@ -14,14 +14,15 @@
     </Page.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+        <Image Source="{Binding Image}"/>
+        <StackPanel Grid.Column="1">
             <ComboBox ItemsSource="{Binding Cameras}" SelectedIndex="{Binding SelectedIndex}" Margin="0 5"/>
             <Button Content="Start capturing" Command="{Binding StartCapture}" Margin="0 5"/>
             <Button Content="Take picture" Command="{Binding TakePicture}" Margin="0 5"/>
+            <Button Content="Stop capturing" Command="{Binding StopCapture}" Margin="0 5"/>
         </StackPanel>
     </Grid>
 </Page>

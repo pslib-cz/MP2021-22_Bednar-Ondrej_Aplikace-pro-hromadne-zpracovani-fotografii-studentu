@@ -45,7 +45,7 @@
 
         <ScrollViewer Grid.Column="1" Grid.ColumnSpan="2">
             <StackPanel>
-                    <ListView ItemsSource="{Binding ImageNames}">
+                    <ListView ItemsSource="{Binding ImageNames}" SelectedItem="{Binding SelectedImg}" SelectionChanged="ListView_SelectionChanged">
                         <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Obrázek" Width="100">
@@ -62,11 +62,34 @@
             </StackPanel>
         </ScrollViewer>
 
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Image Source="{Binding Image, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.RowSpan="3"/>
+                <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"/>
+                <Button Content="Vyberte obrázek" Command="{Binding ChangePhoto}" Grid.Column="1" Grid.Row="1"/>
+                <Button Content="Přidat osobu" Command="{Binding AddPerson}" Grid.Column="1" Grid.Row="2"/>
+                <Button Content="Upravit vybranou osobu" Command="{Binding EditPerson}" Grid.Row="3" Grid.ColumnSpan="2" Padding="5"/>
+                <Button Content="Odebrat vybranou osobu" Command="{Binding RemovePerson}" Grid.Row="4" Grid.ColumnSpan="2" Padding="5"/>
+            </Grid>
+        </StackPanel>
+        
         <StackPanel Grid.Column="2" Grid.Row="1">
-            <Button Content="Vyberte studenty" Command="{Binding AddNamesList}"/>
-            <Button Content="Vyberte fotografie" Command="{Binding AddPhotos}"/>
-            <Button Content="Předzpracovat fotografie" Command="{Binding PreProcessPhotos}"/>
-            <Button Content="zpracovat fotografie" Command="{Binding ProcessPhotos}"/>
+            <Button Content="Vyberte studenty" Command="{Binding AddNamesList}" Margin="0 0 0 5"/>
+            <Button Content="Vyberte fotografie" Command="{Binding AddPhotos}" Margin="0 0 0 5"/>
+            <Button Content="Předzpracovat fotografie" Command="{Binding PreProcessPhotos}" Margin="0 0 0 5"/>
+            <Button Content="zpracovat fotografie" Command="{Binding ProcessPhotos}" Margin="0 0 0 5"/>
         </StackPanel>
     </Grid>
 </Page>

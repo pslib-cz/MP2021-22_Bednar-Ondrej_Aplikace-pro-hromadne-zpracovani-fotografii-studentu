@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BulkPhotoProcessing.Viewmodels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,9 +26,9 @@ namespace BulkPhotoProcessing.Pages
             InitializeComponent();
         }
 
-        private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            ((PhotoProcessingViewmodel)DataContext).SelectionChanged();
         }
     }
 }

@@ -13,12 +13,13 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using UWPBindingCollection.ViewModels;
 
 namespace BulkPhotoProcessing.Viewmodels
 {
-    public class PhotoProcessingViewmodel
+    public class PhotoProcessingViewmodel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -32,18 +33,28 @@ namespace BulkPhotoProcessing.Viewmodels
         private List<string> _files = new List<string>();
         private bool namesChosen = false, picturesChosen = false, preProcessed = false;
         private string _errorPictures = "";
+        private ImageNames _imgName;
+        private string _name;
+        private ImageSource _img;
 
         public ObservableCollection<string> Names { get { return _names; } set { _names = value; NotifyPropertyChanged(); } }
         public ObservableCollection<Image> Images { get { return _images; } set { _images = value; NotifyPropertyChanged(); } }
         public ObservableCollection<ImageNames> ImageNames { get { return _imgNames; } set { _imgNames = value; NotifyPropertyChanged();} }
+        public ImageNames SelectedImg { get { return _imgName; } set { _imgName = value; NotifyPropertyChanged(); } } 
         public bool PreProcessed { get { return preProcessed; } set { preProcessed = value; ProcessPhotos.RaiseCanExecuteChanged(); } }
         public bool PicturesChosen { get { return picturesChosen; } set { picturesChosen = value; PreProcessPhotos.RaiseCanExecuteChanged(); } }
         public bool NamesChosen { get { return namesChosen; } set { namesChosen = value; PreProcessPhotos.RaiseCanExecuteChanged(); } }
+        public string Name { get { return _name; } set { _name = value; NotifyPropertyChanged(); AddPerson.RaiseCanExecuteChanged(); } }
+        public ImageSource Image { get { return _img; } set { _img = value; NotifyPropertyChanged(); AddPerson.RaiseCanExecuteChanged(); } }
         
         public RelayCommand AddPhotos { get; set; }
         public RelayCommand AddNamesList { get; set; }
         public RelayCommand PreProcessPhotos { get; set; }
         public RelayCommand ProcessPhotos { get; set; }
+        public RelayCommand ChangePhoto { get; set; }
+        public RelayCommand AddPerson { get; set; }
+        public RelayCommand RemovePerson { get; set; }
+        public RelayCommand EditPerson { get; set; }
         public PhotoProcessingViewmodel()
         {
             AddPhotos = new RelayCommand(
@@ -56,6 +67,7 @@ namespace BulkPhotoProcessing.Viewmodels
 
                     if (dialog.ShowDialog() == true)
                     {
+                        _errorPictures = "";
                         Images.Clear();
                         _files.Clear();
                         foreach (var path in dialog.FileNames)
@@ -82,7 +94,7 @@ namespace BulkPhotoProcessing.Viewmodels
                             }
                             else
                             {
-                                _errorPictures += $"na {path.Split("\\").Last()} nebyl detekován jeden obličej ! {Environment.NewLine}";
+                                _errorPictures += $"Na {path.Split("\\").Last()} nebyl detekován jeden obličej ! {Environment.NewLine}";
                             }
                         }
 
@@ -125,6 +137,7 @@ namespace BulkPhotoProcessing.Viewmodels
             PreProcessPhotos = new RelayCommand(
                 () =>
                 {
+                    ImageNames.Clear();
                     if (Images.Count != Names.Count)
                     {
                         MessageBox.Show($"Počet fotek a jmen nesedí.\r\nZkontrolujte svoje seznamy a zkuste to znovu. \r\npočet fotek: {_images.Count} \r\npočet jmen: {_names.Count}");
@@ -147,7 +160,7 @@ namespace BulkPhotoProcessing.Viewmodels
                     return false;
                 });
             ProcessPhotos = new RelayCommand(
-                async () =>
+                () =>
                 {
                     for (int i = 0; i < _files.Count; i++)
                     {
@@ -161,13 +174,20 @@ namespace BulkPhotoProcessing.Viewmodels
                             }
                             string file = Path.Combine(path, Names[i] + "." + _files[i].Split('.').Last());
                             Image<Bgr, byte> image = new Image<Bgr, byte>(_files[i]);
-                            CvInvoke.Resize(image, image, new System.Drawing.Size(200, 300), interpolation: Emgu.CV.CvEnum.Inter.Cubic);
-                            image.Save(file);
+                            Mat gray = new Mat();
 
+                            CvInvoke.CvtColor(image, gray, Emgu.CV.CvEnum.ColorConversion.Bgr2Gray);
+                            System.Drawing.Rectangle[] faces = Helper.cascadeClassifier.DetectMultiScale(gray, 1.3, 7, new System.Drawing.Size(30, 30));
+                            foreach (var face in faces)
+                            {
+                                image.ROI = new System.Drawing.Rectangle(face.X - 25, face.Y - 75, face.Width + 50, face.Height + 150);
+                                CvInvoke.Resize(image, image, new System.Drawing.Size(200, 300), interpolation: Emgu.CV.CvEnum.Inter.Cubic);
+                                image.Save(file);
+                            }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            throw;
+                            if (ex.GetType() == typeof(ArgumentException)) MessageBox.Show($"Jeden ze souborů se nepodařilo načíst. Zkontrolujte zda jsou všechny v pořádku a zkuste to prosím znovu");
                         }
                     }
                 },
@@ -175,6 +195,54 @@ namespace BulkPhotoProcessing.Viewmodels
                 {
                     return PreProcessed;
                 });
+            ChangePhoto = new RelayCommand(
+                () =>
+                {
+                    OpenFileDialog dialog = new OpenFileDialog();
+                    dialog.Multiselect = false;
+                    dialog.DefaultExt = ".png";
+                    dialog.Filter = "Image Files (*.BMP;*.JPG;*.PNG)|*.BMP;*.JPG;*.PNG|All files (*.*)|*.*";
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        Image<Bgr, byte> colored = new Image<Bgr, byte>(dialog.FileName);
+                        Image = Helper.ToBitmapSource(colored);
+                    }
+                    AddPerson.RaiseCanExecuteChanged();
+                },
+                () => true);
+            AddPerson = new RelayCommand(
+                () =>
+                {
+                    ImageNames person = new ImageNames()
+                    {
+                        Image = _img,
+                        Name = _name
+                    };
+                    ImageNames.Add(person);
+                },
+                () => Name != "" && Image != null);
+            RemovePerson = new RelayCommand(
+                () =>
+                {
+                    ImageNames.Remove(SelectedImg);
+                },
+                () => SelectedImg != null);
+            EditPerson = new RelayCommand(
+                () =>
+                {
+                    SelectedImg.Name = Name;
+                    SelectedImg.Image = Image;
+                },
+                () => SelectedImg != null);
+        }
+        public void SelectionChanged()
+        {
+            RemovePerson.RaiseCanExecuteChanged();
+            EditPerson.RaiseCanExecuteChanged();
+            if (SelectedImg == null) return;
+            Name = SelectedImg.Name;
+            Image = SelectedImg.Image;
         }
     }
 }
