@@ -20,6 +20,7 @@ namespace BulkPhotoProcessing.NewFolder
 
         private string _name;
         private ImageSource _source;
+        public string Path { get; set; }
         public string Name { get { return _name; } set { _name = value; NotifyPropertyChanged(); } }
         public ImageSource Image { get { return _source; } set { _source = value; NotifyPropertyChanged(); } }
     }

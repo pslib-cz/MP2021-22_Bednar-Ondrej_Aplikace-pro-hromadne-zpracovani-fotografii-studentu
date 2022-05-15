@@ -26,9 +26,14 @@ namespace BulkPhotoProcessing.Pages
             InitializeComponent();
         }
 
-        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void PersonSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ((PhotoProcessingViewmodel)DataContext).SelectionChanged();
+            ((PhotoProcessingViewmodel)DataContext).ListSelectionChanged();
+        }
+
+        private void NameSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ((PhotoProcessingViewmodel)DataContext).NameSelectionChanged();
         }
     }
 }

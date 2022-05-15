@@ -39,14 +39,14 @@
 
         <ScrollViewer Grid.Row="1">
             <StackPanel>
-                <ListBox ItemsSource="{Binding Names}" FlowDirection="LeftToRight" />
+                <ListBox ItemsSource="{Binding Names}" FlowDirection="LeftToRight" SelectedItem="{Binding SelectedName}" SelectionChanged="NameSelectionChanged"/>
             </StackPanel>
         </ScrollViewer>
 
         <ScrollViewer Grid.Column="1" Grid.ColumnSpan="2">
             <StackPanel>
-                    <ListView ItemsSource="{Binding ImageNames}" SelectedItem="{Binding SelectedImg}" SelectionChanged="ListView_SelectionChanged">
-                        <ListView.View>
+                <ListView ItemsSource="{Binding ImageNames}" SelectedItem="{Binding SelectedImg}" SelectionChanged="PersonSelectionChanged">
+                    <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Obrázek" Width="100">
                                 <GridViewColumn.CellTemplate>
@@ -79,9 +79,9 @@
                 <Image Source="{Binding Image, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.RowSpan="3"/>
                 <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"/>
                 <Button Content="Vyberte obrázek" Command="{Binding ChangePhoto}" Grid.Column="1" Grid.Row="1"/>
-                <Button Content="Přidat osobu" Command="{Binding AddPerson}" Grid.Column="1" Grid.Row="2"/>
-                <Button Content="Upravit vybranou osobu" Command="{Binding EditPerson}" Grid.Row="3" Grid.ColumnSpan="2" Padding="5"/>
-                <Button Content="Odebrat vybranou osobu" Command="{Binding RemovePerson}" Grid.Row="4" Grid.ColumnSpan="2" Padding="5"/>
+                <Button Content="Upravit vybranou osobu" Command="{Binding EditPerson}" Grid.Column="1" Grid.Row="2"/>
+                <Button Content="Přidat osobu" Command="{Binding AddPerson}" Grid.Row="3" Grid.ColumnSpan="2" Padding="5" Margin="0 5 0 0"/>
+                <Button Content="Odebrat vybranou osobu" Command="{Binding RemovePerson}" Grid.Row="4" Grid.ColumnSpan="2" Padding="5"  Margin="0 5 0 0"/>
             </Grid>
         </StackPanel>
         
